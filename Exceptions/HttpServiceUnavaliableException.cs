@@ -1,4 +1,4 @@
-﻿namespace HTTPRequest.Exception
+﻿namespace HTTPRequest.Exceptions
 {
     public class HttpServiceUnavaliableException : System.Exception
     {

@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 using Newtonsoft.Json;
 
-using HTTPRequest.Exception;
-using HTTPRequest.Model;
+using HTTPRequest.Exceptions;
+using HTTPRequest.Models;
 using HTTPRequest.Types;
-using HTTPRequest.Util;
+using HTTPRequest.Utils;
 
 namespace HTTPRequest
 {

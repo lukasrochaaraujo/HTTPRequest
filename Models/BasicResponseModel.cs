@@ -1,4 +1,4 @@
-﻿namespace HTTPRequest.Model
+﻿namespace HTTPRequest.Models
 {
     public class BasicResponseModel
     {

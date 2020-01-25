@@ -1,6 +1,6 @@
 ﻿using System.Net;
 
-namespace HTTPRequest.Model
+namespace HTTPRequest.Models
 {
     public class HttpResponseModel<T>
     {

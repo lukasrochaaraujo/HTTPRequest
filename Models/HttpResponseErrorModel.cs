@@ -2,7 +2,7 @@
 
 using System.Collections.Generic;
 
-namespace HTTPRequest.Model
+namespace HTTPRequest.Models
 {
     public class HttpResponseErrorModel
     {

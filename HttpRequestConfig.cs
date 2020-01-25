@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-using HTTPRequest.Enum;
+using HTTPRequest.Enums;
 
 namespace HTTPRequest
 {
@@ -26,7 +26,7 @@ namespace HTTPRequest
         public string GetBasicAuthHash()
         {
             if (string.IsNullOrWhiteSpace(BasicAuthUsername) || string.IsNullOrWhiteSpace(BasicAuthPassword))
-                throw new ArgumentNullException("Os dados de autenticação não foram fornecidos (user AddAuthorization(usuario, senha))");
+                throw new ArgumentNullException("BasicAuthorization data not provided (use: AddAuthorization(user, pass))");
 
             return "Basic " + Convert.ToBase64String(Encoding.Default.GetBytes(BasicAuthUsername + ":" + BasicAuthPassword));
         }
@@ -44,7 +44,7 @@ namespace HTTPRequest
 
         public string GetApplicationInfo()
         {
-            StringBuilder sbInfo = new StringBuilder();
+            var sbInfo = new StringBuilder();
 
             if (!string.IsNullOrWhiteSpace(ApplicationName))
                 sbInfo.Append(ApplicationName);

@@ -1,4 +1,4 @@
-﻿namespace HTTPRequest.Enum
+﻿namespace HTTPRequest.Enums
 {
     public enum IsoDateTimeType
     {

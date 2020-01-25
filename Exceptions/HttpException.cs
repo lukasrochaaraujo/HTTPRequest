@@ -1,8 +1,8 @@
 ﻿using System.Text;
 
-using HTTPRequest.Model;
+using HTTPRequest.Models;
 
-namespace HTTPRequest.Exception
+namespace HTTPRequest.Exceptions
 {
     public class HttpException : System.Exception
     {
