@@ -1,55 +1,29 @@
-﻿using System.Text;
+﻿using System;
+using System.Collections.Generic;
+using System.Dynamic;
 
-using HTTPRequest.Models;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace HTTPRequest.Exceptions
 {
-    public class HttpException : System.Exception
+    public class HttpException : Exception
     {
-        public HttpResponseErrorModel HttpResponse;
+        public dynamic HttpResponseDynamic;
 
-        public HttpException(HttpResponseErrorModel response, string message) : base(message)
+        public HttpException(string responseJson, string message) : base(message)
         {
-            HttpResponse = response;
+            HttpResponseDynamic = ToDynamicObject(responseJson);
         }
 
-        public HttpException(HttpResponseErrorModel response, string message, System.Exception innerException) : base(message, innerException)
+        public HttpException(string responseJson, string message, Exception innerException) : base(message, innerException)
         {
-            HttpResponse = response;
+            HttpResponseDynamic = ToDynamicObject(responseJson);
         }
 
-        public string GetParsedMessage()
+        private dynamic ToDynamicObject(string json)
         {
-            StringBuilder message = new StringBuilder();
-
-            message.AppendLine($"Status HTTP: {HttpResponse.Status}\n");
-
-            if (!string.IsNullOrWhiteSpace(HttpResponse.TraceId))
-                message.AppendLine($"Trace ID: {HttpResponse.TraceId}\n");
-
-            if (!string.IsNullOrWhiteSpace(HttpResponse.Title))
-                message.AppendLine($"Título: {HttpResponse.Title}\n");
-
-            if (!string.IsNullOrWhiteSpace(HttpResponse.Message))
-                message.AppendLine($"Mensagem: {HttpResponse.Message}\n");
-
-            if (!string.IsNullOrWhiteSpace(HttpResponse.Path))
-                message.AppendLine($"Caminho: {HttpResponse.Path}\n");
-
-            if (!string.IsNullOrWhiteSpace(HttpResponse.Error))
-                message.AppendLine($"Erro: {HttpResponse.Error}\n");
-
-            if (HttpResponse.ErrorsDictionary != null && HttpResponse.ErrorsDictionary.Count > 0)
-            {
-                message.AppendLine($"Erros:\n");
-
-                foreach (var erro in HttpResponse.ErrorsDictionary)
-                    message.AppendLine($"{erro.Key} => '{erro.Value.ToString()}'");
-
-                message.AppendLine();
-            }
-
-            return message.ToString();
+            return (dynamic)JsonConvert.DeserializeObject<List<ExpandoObject>>(json, new ExpandoObjectConverter());
         }
     }
 }

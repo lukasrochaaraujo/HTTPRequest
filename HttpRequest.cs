@@ -128,14 +128,7 @@ namespace HTTPRequest
                 if (statusCode == HttpStatusCode.NotFound)
                     return default(T);
 
-                if (statusCode == HttpStatusCode.Unauthorized)
-                    throw new HttpException(new HttpResponseErrorModel() { Status = (int)statusCode }, "HTTP 401: Unauthorized");
-
-                if (statusCode == HttpStatusCode.ServiceUnavailable)
-                    throw new HttpServiceUnavaliableException("HTTP 503: Service Unavailable");
-
-                var errorResponse = JsonConvert.DeserializeObject<HttpResponseErrorModel>(responseJson);
-                throw new HttpException(errorResponse, (errorResponse?.Message ?? "Unknown Error"));
+                throw new HttpException(responseJson, $"HTTP Status Code: {statusCode.ToString()}");
             }
         }
     }
