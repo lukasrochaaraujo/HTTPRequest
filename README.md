@@ -40,33 +40,5 @@ entre as tags < e >.
 As requisições estão programadas para lançar uma exceção do tipo *HttpException* em caso de 
 status HTTP maior que 300.
 
-O objeto *HttpException* fornece uma propriedade do tipo *HttpResponseErrorModel*, a qual
-contém detalhes sobre do erro, que são:
-
-```csharp
-//O título principal fornecido pela implementação da API
-public string Title { get; set; }
-
-//O código de status HTTP
-public int Status { get; set; }
-
-//Detalhes do erro
-public string Error { get; set; }
-
-//Um conjunto de chave:valor com erros de validação
-//A classe HttpException fornece o método GetParsedMessage()
-//que exibe de forma legível os dados do erro
-public Dictionary<string, object> ErrorsDictionary { get; set; }
-
-//O texto da exceção fornecido pela implemntação da API
-public string Exception { get; set; }
-
-//Mensagem com mais dealhes do erro
-public string Message { get; set; }
-
-//Caminho da requisição
-public string Path { get; set; }
-
-//Identificador da exceção
-public string TraceId { get; set; }
-```
+O objeto *HttpException* fornece uma propriedade do tipo *HttpResponseDynamic*, a qual
+é um objecto do tipo *dynamic* construído a partir do json da resposta.
