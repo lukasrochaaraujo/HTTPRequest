@@ -6,100 +6,69 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 using HTTPRequest.Exceptions;
 using HTTPRequest.Models;
 using HTTPRequest.Types;
-using HTTPRequest.Utils;
 
 namespace HTTPRequest
 {
     public class HttpRequest
     {
-        private HttpRequestConfig RequestConfiguration;
+        private static HttpClient HTTPClient = new HttpClient();
+        private string IsoDateTimeFormatString = "yyyy-MM-ddTHH:mm:ss";
         private Dictionary<string, string> RequestHeaders;
 
-        public HttpRequest(HttpRequestConfig config)
+        public HttpRequest()
         {
-            RequestConfiguration = config;
             RequestHeaders = new Dictionary<string, string>();
         }
 
-        public void AppendHeader(string key, string value)
-        {
-            RequestHeaders.Add(key, value);
-        }
+        public void AppendHeader(string key, string value) => HTTPClient.DefaultRequestHeaders.TryAddWithoutValidation(key, value);
+
+        public void ChangeISODateTimeFormat(string newFormat) => IsoDateTimeFormatString = newFormat;
 
         public async Task<T> GETAsync<T>(string url)
         {
-            using (var http = PrepareRequestHeader())
-            {
-                HttpResponseMessage response = await http.GetAsync(new Uri(url));
-                string json = await response.Content.ReadAsStringAsync();
-                return PrepareResponse<T>(json, response.StatusCode);
-            }
+            HttpResponseMessage response = await HTTPClient.GetAsync(new Uri(url));
+            string json = await response.Content.ReadAsStringAsync();
+            return PrepareResponse<T>(json, response.StatusCode);
         }
 
         public async Task<T> POSTAsync<T>(string url, string jsonData)
         {
-            using (var http = PrepareRequestHeader())
-            {
-                Uri uri = new Uri(url);
-                HttpResponseMessage response = await http.PostAsync(uri.AbsoluteUri, CreateBodyRequest(jsonData));
-                string json = await response.Content.ReadAsStringAsync();
-                return PrepareResponse<T>(json, response.StatusCode);
-            }
+            Uri uri = new Uri(url);
+            HttpResponseMessage response = await HTTPClient.PostAsync(uri.AbsoluteUri, CreateBodyRequest(jsonData));
+            string json = await response.Content.ReadAsStringAsync();
+            return PrepareResponse<T>(json, response.StatusCode);
         }
 
         public async Task<T> PUTAsync<T>(string url)
         {
-            using (var http = PrepareRequestHeader())
-            {
-                Uri uri = new Uri(url);
-                HttpResponseMessage response = await http.PutAsync(uri.AbsoluteUri, null);
-                string json = await response.Content.ReadAsStringAsync();
-                return PrepareResponse<T>(json, response.StatusCode);
-            }
+            Uri uri = new Uri(url);
+            HttpResponseMessage response = await HTTPClient.PutAsync(uri.AbsoluteUri, null);
+            string json = await response.Content.ReadAsStringAsync();
+            return PrepareResponse<T>(json, response.StatusCode);
         }
 
         public async Task<T> PUTAsync<T>(string url, string jsonData)
         {
-            using (var http = PrepareRequestHeader())
-            {
-                Uri uri = new Uri(url);
-                HttpResponseMessage response = await http.PutAsync(uri.AbsoluteUri, CreateBodyRequest(jsonData));
-                string json = await response.Content.ReadAsStringAsync();
-                return PrepareResponse<T>(json, response.StatusCode);
-            }
+            Uri uri = new Uri(url);
+            HttpResponseMessage response = await HTTPClient.PutAsync(uri.AbsoluteUri, CreateBodyRequest(jsonData));
+            string json = await response.Content.ReadAsStringAsync();
+            return PrepareResponse<T>(json, response.StatusCode);
         }
 
         public async Task DELETEAsync<T>(string url)
         {
-            using (var http = PrepareRequestHeader())
-            {
-                Uri uri = new Uri(url);
-                HttpResponseMessage response = await http.DeleteAsync(uri.AbsoluteUri);
-                string json = await response.Content.ReadAsStringAsync();
-                PrepareResponse<T>(json, response.StatusCode);
-            }
+            Uri uri = new Uri(url);
+            HttpResponseMessage response = await HTTPClient.DeleteAsync(uri.AbsoluteUri);
+            string json = await response.Content.ReadAsStringAsync();
+            PrepareResponse<T>(json, response.StatusCode);
         }
 
-        private HttpClient PrepareRequestHeader()
-        {
-            HttpClient http = new HttpClient();
-            http.DefaultRequestHeaders.TryAddWithoutValidation(HeadersType.Authorization, RequestConfiguration.GetBasicAuthHash());
-            http.DefaultRequestHeaders.TryAddWithoutValidation(HeadersType.UserAgent, RequestConfiguration.GetApplicationInfo());
-
-            foreach (var header in RequestHeaders)
-                http.DefaultRequestHeaders.TryAddWithoutValidation(header.Key, header.Value);
-
-            return http;
-        }
-
-        private StringContent CreateBodyRequest(string jsonData)
-        {
-            return new StringContent(jsonData, Encoding.UTF8, MediaType.ApplicationJson);
-        }
+        private StringContent CreateBodyRequest(string jsonData) => new StringContent(jsonData, Encoding.UTF8, MediaType.ApplicationJson);
 
         private T PrepareResponse<T>(string responseJson, HttpStatusCode statusCode)
         {
@@ -121,7 +90,7 @@ namespace HTTPRequest
                 else if (responseJson == "[]")
                     return (T)Activator.CreateInstance(typeof(T));
                 else
-                    return JsonConvert.DeserializeObject<T>(responseJson, IsoDateTimeFactory.Create(RequestConfiguration.IsoDateTimeFormat));
+                    return JsonConvert.DeserializeObject<T>(responseJson, new IsoDateTimeConverter() { DateTimeFormat = IsoDateTimeFormatString });
             }
             else
             {

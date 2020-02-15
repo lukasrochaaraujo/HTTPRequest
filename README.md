@@ -10,11 +10,9 @@ Biblioteca para realizar requisições via HTTP
 **Inicialização**
 
 ```csharp
-var config = new HttpRequestConfig();
-config.AddBasicAuthorization('foo', 'bar');
-config.AddApplicationInfo('myappname', 'myappversioin');
-
-var httpRequest = new HttpRequest(config);
+var httpRequest = new HttpRequest();
+httpRequest.AppendHeader(key, value); (optional)
+httpRequest.ChangeISODateTimeFormat("newFormat"); (optional)
 ```
 
 **Requisições**
