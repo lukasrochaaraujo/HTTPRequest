@@ -17,17 +17,17 @@ httpRequest.ChangeISODateTimeFormat("newFormat"); (optional)
 
 **Requisições**
 
-A biblioteca dispõe de 4 métodos estáticos e genéricos que, representam 
+A biblioteca dispõe de 4 métodos genéricos que, representam 
 os principais verbos de comunicação via HTTP, que são:
 
 ```csharp
-async Task<T> HttpRequest.GETAsync<T>(string url);
+async Task<T> GETAsync<T>(string url);
 
-async Task<T> HttpRequest.POSTAsync<T>(string url);
+async Task<T> POSTAsync<T>(string url);
 
-async Task<T> HttpRequest.PUTAsync<T>(string url);
+async Task<T> PUTAsync<T>(string url);
 
-async Task HttpRequest.DELETEAsync<T>(string url);
+async Task DELETEAsync<T>(string url);
 ```
 
 Tais métodos já realizam a conversão de JSON para o objeto indicado
