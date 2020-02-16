@@ -25,9 +25,35 @@ namespace HTTPRequest
             RequestHeaders = new Dictionary<string, string>();
         }
 
-        public void AppendHeader(string key, string value) => HTTPClient.DefaultRequestHeaders.TryAddWithoutValidation(key, value);
+        public void AddHeader(string key, string value)
+        {
+            if (!RequestHeaders.ContainsKey(key)) 
+                RequestHeaders.Add(key, value);
+
+            HTTPClient.DefaultRequestHeaders.TryAddWithoutValidation(key, value);
+        }
+
+        public void RemoveHeader(string key)
+        {
+            if (RequestHeaders.ContainsKey(key))
+                RequestHeaders.Remove(key);
+        }
 
         public void ChangeISODateTimeFormat(string newFormat) => IsoDateTimeFormatString = newFormat;
+
+        public void ResetHTTPClientAndDiscardHeaders()
+        {
+            HTTPClient = new HttpClient();
+            RequestHeaders.Clear();
+        }
+
+        public void ResetHTTPClientAndKeepHeaders()
+        {
+            HTTPClient = new HttpClient();
+
+            foreach (var header in RequestHeaders)
+                HTTPClient.DefaultRequestHeaders.TryAddWithoutValidation(header.Key, header.Value);
+        }
 
         public async Task<T> GETAsync<T>(string url)
         {

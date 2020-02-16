@@ -8,30 +8,40 @@ Biblioteca para realizar requisições via HTTP
 
 **Utilização**
 
-A biblioteca dispõe de 4 métodos genéricos que representam 
-os principais verbos de comunicação via HTTP:
-
-```csharp
-async Task<T> GETAsync<T>(string url);
-
-async Task<T> POSTAsync<T>(string url);
-
-async Task<T> PUTAsync<T>(string url);
-
-async Task DELETEAsync<T>(string url);
-```
-
-**Exemplo**
-
 ```csharp
 var httpRequest = new HttpRequest();
-httpRequest.AppendHeader(key, value); (optional)
-httpRequest.ChangeISODateTimeFormat("newFormat"); (optional)
 await httpRequest.GETAsync<List<Employer>>("https://api.server.com/employer");
 ```
 
-Tais métodos já realizam a conversão de JSON para o objeto indicado
-entre as tags < e >.
+**Métodos disponíveis**
+```csharp
+//Envia uma solicitação GET
+async Task<T> GETAsync<T>(string url);
+
+//Envia uma solicitação POST
+async Task<T> POSTAsync<T>(string url);
+
+//Envia uma solicitação PUT
+async Task<T> PUTAsync<T>(string url);
+
+//Envia uma solicitação DELETE
+async Task DELETEAsync<T>(string url);
+
+//Adiciona dados ao header
+void AddHeader(string key, string value);
+
+//Remove dados do header
+void RemoveHeader(string key);
+
+//Altera o farmato de conversão de DATA e HORA 
+void ChangeISODateTimeFormat(string newFormat);
+
+//Reinicia a instância HttpClient e descarta os headers adiconados
+void ResetHTTPClientAndDiscardHeaders();
+
+//Reinicia a instância HttpClient e mantém os headers adicionados
+void ResetHTTPClientAndKeepHeaders();
+```
 
 **Exceções**
 
