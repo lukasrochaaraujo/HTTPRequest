@@ -1,24 +1,15 @@
 ﻿## HTTPRequest
 Biblioteca para realizar requisições via HTTP
-- Suporte inicial somente para Basic Auth
 
 **Dependências**
 
 * .NET Standard 2.0.3
 * Newtonsoft.Json 12.0.3
 
-**Inicialização**
+**Utilização**
 
-```csharp
-var httpRequest = new HttpRequest();
-httpRequest.AppendHeader(key, value); (optional)
-httpRequest.ChangeISODateTimeFormat("newFormat"); (optional)
-```
-
-**Requisições**
-
-A biblioteca dispõe de 4 métodos genéricos que, representam 
-os principais verbos de comunicação via HTTP, que são:
+A biblioteca dispõe de 4 métodos genéricos que representam 
+os principais verbos de comunicação via HTTP:
 
 ```csharp
 async Task<T> GETAsync<T>(string url);
@@ -28,6 +19,15 @@ async Task<T> POSTAsync<T>(string url);
 async Task<T> PUTAsync<T>(string url);
 
 async Task DELETEAsync<T>(string url);
+```
+
+**Exemplo**
+
+```csharp
+var httpRequest = new HttpRequest();
+httpRequest.AppendHeader(key, value); (optional)
+httpRequest.ChangeISODateTimeFormat("newFormat"); (optional)
+await httpRequest.GETAsync<List<Employer>>("https://api.server.com/employer");
 ```
 
 Tais métodos já realizam a conversão de JSON para o objeto indicado
