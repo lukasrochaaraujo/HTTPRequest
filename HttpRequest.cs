@@ -16,7 +16,7 @@ namespace HTTPRequest
 {
     public class HttpRequest
     {
-        private static HttpClient HTTPClient = new HttpClient();
+        private HttpClient HTTPClient = new HttpClient();
         private string IsoDateTimeFormatString = "yyyy-MM-ddTHH:mm:ss";
         private Dictionary<string, string> RequestHeaders;
 
