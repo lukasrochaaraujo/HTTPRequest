@@ -98,25 +98,27 @@ namespace HTTPRequest
 
         private T PrepareResponse<T>(string responseJson, HttpStatusCode statusCode)
         {
-            if (typeof(T) == typeof(BasicResponseModel))
-            {
-                var responseModel = new BasicResponseModel()
-                {
-                    StatusCode = (int)statusCode,
-                    JsonBody = responseJson
-                };
-
-                return (T)Convert.ChangeType(responseModel, typeof(T));
-            }                
-
             if ((int)statusCode >= (int)HttpStatusCode.OK && (int)statusCode < (int)HttpStatusCode.MultipleChoices)
             {
-                if (string.IsNullOrWhiteSpace(responseJson))
-                    return default(T);
-                else if (responseJson == "[]")
-                    return (T)Activator.CreateInstance(typeof(T));
+                if (typeof(T) == typeof(BasicResponseModel))
+                {
+                    var responseModel = new BasicResponseModel()
+                    {
+                        StatusCode = (int)statusCode,
+                        JsonBody = responseJson
+                    };
+
+                    return (T)Convert.ChangeType(responseModel, typeof(T));
+                }
                 else
-                    return JsonConvert.DeserializeObject<T>(responseJson, new IsoDateTimeConverter() { DateTimeFormat = IsoDateTimeFormatString });
+                {
+                    if (string.IsNullOrWhiteSpace(responseJson))
+                        return default(T);
+                    else if (responseJson == "[]")
+                        return (T)Activator.CreateInstance(typeof(T));
+                    else
+                        return JsonConvert.DeserializeObject<T>(responseJson, new IsoDateTimeConverter() { DateTimeFormat = IsoDateTimeFormatString });
+                }
             }
             else
             {
