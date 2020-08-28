@@ -9,7 +9,10 @@ Biblioteca para realizar requisições via HTTP
 **Utilização**
 
 ```csharp
-var httpRequest = new HttpRequest();
+//basic auth
+var config = new HttpRequestConfig();
+config.AddBasicAuthorization("root", "toor");
+var httpRequest = new HttpRequest(config);
 await httpRequest.GETAsync<List<Employer>>("https://api.server.com/employer");
 ```
 
@@ -42,11 +45,3 @@ void ResetHTTPClientAndDiscardHeaders();
 //Reinicia a instância HttpClient e mantém os headers adicionados
 void ResetHTTPClientAndKeepHeaders();
 ```
-
-**Exceções**
-
-As requisições estão programadas para lançar uma exceção do tipo *HttpException* em caso de 
-status HTTP maior que 300.
-
-O objeto *HttpException* fornece uma propriedade do tipo *HttpResponseDynamic*, a qual
-é um objecto do tipo *dynamic* construído a partir do json da resposta.

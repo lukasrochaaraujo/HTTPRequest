@@ -1,4 +1,4 @@
-﻿namespace HTTPRequest.Models
+﻿namespace GSD.HTTPRequest.Model
 {
     public class BasicResponseModel
     {
