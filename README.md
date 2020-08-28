@@ -36,11 +36,8 @@ void AddHeader(string key, string value);
 //Remove dados do header
 void RemoveHeader(string key);
 
-//Altera o farmato de conversão de DATA e HORA 
-void ChangeISODateTimeFormat(string newFormat);
-
-//Reinicia a instância HttpClient e descarta os headers adiconados
-void ResetHTTPClientAndDiscardHeaders();
+//Altera o timout padrão para 60 segundos
+void AddNewTimeout(60);
 
 //Reinicia a instância HttpClient e mantém os headers adicionados
 void ResetHTTPClientAndKeepHeaders();
