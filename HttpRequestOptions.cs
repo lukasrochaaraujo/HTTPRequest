@@ -1,12 +1,10 @@
 ﻿using System.Net.Http;
 
-using GSD.HTTPRequest.Enum;
-
-namespace GSD.HTTPRequest.Model
+namespace HTTPRequest
 {
     public class HttpRequestOptions
     {
-        public HTTPMethod Method { get; set; }
+        public HttpMethod Method { get; set; }
 
         public string URI { get; set; }
 

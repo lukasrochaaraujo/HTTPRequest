@@ -1,9 +1,10 @@
 ﻿using System;
 
-namespace GSD.HTTPRequest.Exceptions
+namespace HTTPRequest.Exceptions
 {
     public class HttpTimeoutException : Exception
     {
-        public HttpTimeoutException(string message) : base(message) { }
+        public HttpTimeoutException(string message, Exception innerException) : 
+            base(message, innerException) { }
     }
 }

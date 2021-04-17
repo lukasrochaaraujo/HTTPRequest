@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Text;
 
-using GSD.HTTPRequest.Enum;
+using HTTPRequest.Types;
 
-namespace GSD.HTTPRequest
+namespace HTTPRequest
 {
     public class HttpRequestConfig
     {
@@ -33,10 +33,10 @@ namespace GSD.HTTPRequest
             BearerAccessToken = accessToken;
         }
 
-        public string GetBasicAuthHash()
+        public string GetBasicAuth()
         {
             if (string.IsNullOrWhiteSpace(BasicAuthUsername) || string.IsNullOrWhiteSpace(BasicAuthPassword))
-                throw new ArgumentNullException("Os dados de autenticação não foram fornecidos (user AddAuthorization(usuario, senha))");
+                throw new ArgumentNullException($"{nameof(BasicAuthUsername)} and {nameof(BasicAuthPassword)} not configured on {nameof(HttpRequestConfig)}");
 
             return "Basic " + Convert.ToBase64String(Encoding.Default.GetBytes(BasicAuthUsername + ":" + BasicAuthPassword));
         }
@@ -44,7 +44,7 @@ namespace GSD.HTTPRequest
         public string GetBearerAuth()
         {
             if (string.IsNullOrWhiteSpace(BearerAccessToken))
-                throw new ArgumentNullException("Os dados de autenticação não foram fornecidos (user AddAuthorization(access token))");
+                throw new ArgumentNullException($"{nameof(BearerAccessToken)} not configured on {nameof(HttpRequestConfig)}");
 
             return "Bearer " + BearerAccessToken;
         }

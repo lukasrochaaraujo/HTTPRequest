@@ -1,4 +1,4 @@
-﻿namespace GSD.HTTPRequest.Enum
+﻿namespace HTTPRequest.Types
 {
     public enum IsoDateTimeType
     {

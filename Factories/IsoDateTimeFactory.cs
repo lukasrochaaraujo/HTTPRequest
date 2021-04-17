@@ -1,8 +1,8 @@
 ﻿using Newtonsoft.Json.Converters;
 
-using GSD.HTTPRequest.Enum;
+using HTTPRequest.Types;
 
-namespace GSD.HTTPRequest.Util
+namespace HTTPRequest.Factories
 {
     public static class IsoDateTimeFactory
     {

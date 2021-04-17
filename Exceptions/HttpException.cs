@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GSD.HTTPRequest.Exceptions
+namespace HTTPRequest.Exceptions
 {
     public class HttpException : Exception
     {

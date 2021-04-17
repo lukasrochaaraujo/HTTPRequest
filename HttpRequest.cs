@@ -8,42 +8,34 @@ using System.Threading.Tasks;
 
 using Newtonsoft.Json;
 
-using GSD.HTTPRequest.Enum;
-using GSD.HTTPRequest.Exceptions;
-using GSD.HTTPRequest.Model;
-using GSD.HTTPRequest.Types;
-using GSD.HTTPRequest.Util;
+using HTTPRequest.Exceptions;
+using HTTPRequest.Factories;
+using HTTPRequest.Model;
+using HTTPRequest.Types;
 
-namespace GSD.HTTPRequest
+namespace HTTPRequest
 {
     public class HttpRequest
     {
-        private HttpClientCustom HTTPClient;
+        protected HttpClient HttpClient;
 
-        private HttpRequestConfig HttpRequestConfig;
+        protected HttpRequestConfig HttpRequestConfig;
 
-        public HttpContent HttpContent;
-
-        private Dictionary<string, string> RequestHeaders;
+        protected Dictionary<string, string> RequestHeaders;
 
         public HttpRequest(HttpRequestConfig config)
         {
-            HTTPClient = new HttpClientCustom();
+            HttpClient = new HttpClient();
             HttpRequestConfig = config;
             RequestHeaders = new Dictionary<string, string>();
         }
 
-        public void AddNewTimeout(int newSeconds)
-        {
-            HTTPClient.Timeout = TimeSpan.FromSeconds(newSeconds);
-        }
-
-        public void AddHeader(string key, string value)
+        public void AppendHeader(string key, string value)
         {
             if (!RequestHeaders.ContainsKey(key))
                 RequestHeaders.Add(key, value);
 
-            HTTPClient.DefaultRequestHeaders.TryAddWithoutValidation(key, value);
+            HttpClient.DefaultRequestHeaders.TryAddWithoutValidation(key, value);
         }
 
         public void RemoveHeader(string key)
@@ -52,31 +44,26 @@ namespace GSD.HTTPRequest
                 RequestHeaders.Remove(key);
         }
 
-        public void ResetHTTPClientAndDiscardHeaders()
+        public void ClearHeader()
         {
-            HTTPClient = new HttpClientCustom();
             RequestHeaders.Clear();
+            HttpClient.DefaultRequestHeaders.Clear();
         }
 
-        public void ResetHTTPClientAndKeepHeaders()
+        public void ChangeTimeoutFromSeconds(int newSeconds)
         {
-            HTTPClient = new HttpClientCustom();
-
-            foreach (var header in RequestHeaders)
-                HTTPClient.DefaultRequestHeaders.TryAddWithoutValidation(header.Key, header.Value);
+            HttpClient.Timeout = TimeSpan.FromSeconds(newSeconds);
         }
 
         public async Task<T> GETAsync<T>(string url)
         {
             using (var http = PrepareRequestHeader())
             {
-                HttpResponseMessage response = await SendRequest(http, new HttpRequestOptions()
+                return await SendRequest<T>(http, new HttpRequestOptions()
                 {
-                    Method = HTTPMethod.GET,
+                    Method = HttpMethod.Get,
                     URI = url
                 });
-                string json = await response.Content.ReadAsStringAsync();
-                return PrepareResponse<T>(json, response.StatusCode);
             }
         }
 
@@ -85,24 +72,12 @@ namespace GSD.HTTPRequest
             using (var http = PrepareRequestHeader())
             {
                 Uri uri = new Uri(url);
-                HttpResponseMessage response;
-
-                HttpContent content;
-                if (HttpContent != null)
-                    content = HttpContent;
-                else
-                    content = CreateBodyRequest(jsonData);
-
-                response = await SendRequest(http, new HttpRequestOptions()
+                return await SendRequest<T>(http, new HttpRequestOptions()
                 {
-                    Method = HTTPMethod.POST,
+                    Method = HttpMethod.Post,
                     URI = uri.AbsoluteUri,
-                    HttpContent = content
+                    HttpContent = CreateBodyRequest(jsonData)
                 });
-
-                string json = await response.Content.ReadAsStringAsync();
-
-                return PrepareResponse<T>(json, response.StatusCode);
             }
         }
 
@@ -111,18 +86,12 @@ namespace GSD.HTTPRequest
             using (var http = PrepareRequestHeader())
             {
                 Uri uri = new Uri(url);
-                HttpResponseMessage response;
-
-                response = await SendRequest(http, new HttpRequestOptions()
+                return await SendRequest<T>(http, new HttpRequestOptions()
                 {
-                    Method = HTTPMethod.POST,
+                    Method = HttpMethod.Post,
                     URI = uri.AbsoluteUri,
                     HttpContent = httpContent
                 });
-
-                string json = await response.Content.ReadAsStringAsync();
-
-                return PrepareResponse<T>(json, response.StatusCode);
             }
         }
 
@@ -131,14 +100,12 @@ namespace GSD.HTTPRequest
             using (var http = PrepareRequestHeader())
             {
                 Uri uri = new Uri(url);
-                HttpResponseMessage response = await SendRequest(http, new HttpRequestOptions()
+                return await SendRequest<T>(http, new HttpRequestOptions()
                 {
-                    Method = HTTPMethod.PUT,
+                    Method = HttpMethod.Put,
                     URI = uri.AbsoluteUri,
                     StringContent = null
                 });
-                string json = await response.Content.ReadAsStringAsync();
-                return PrepareResponse<T>(json, response.StatusCode);
             }
         }
 
@@ -147,14 +114,12 @@ namespace GSD.HTTPRequest
             using (var http = PrepareRequestHeader())
             {
                 Uri uri = new Uri(url);
-                HttpResponseMessage response = await SendRequest(http, new HttpRequestOptions()
+                return await SendRequest<T>(http, new HttpRequestOptions()
                 {
-                    Method = HTTPMethod.PUT,
+                    Method = HttpMethod.Put,
                     URI = uri.AbsoluteUri,
                     StringContent = CreateBodyRequest(jsonData)
                 });
-                string json = await response.Content.ReadAsStringAsync();
-                return PrepareResponse<T>(json, response.StatusCode);
             }
         }
 
@@ -163,76 +128,82 @@ namespace GSD.HTTPRequest
             using (var http = PrepareRequestHeader())
             {
                 Uri uri = new Uri(url);
-                HttpResponseMessage response = await SendRequest(http, new HttpRequestOptions()
+                await SendRequest<T>(http, new HttpRequestOptions()
                 {
-                    Method = HTTPMethod.DELETE,
+                    Method = HttpMethod.Delete,
                     URI = uri.AbsoluteUri
                 });
-                string json = await response.Content.ReadAsStringAsync();
-                PrepareResponse<T>(json, response.StatusCode);
             }
         }
 
-        protected async Task<HttpResponseMessage> SendRequest(HttpClient http, HttpRequestOptions options)
+        protected async Task<T> SendRequest<T>(HttpClient http, HttpRequestOptions options)
         {
             try
             {
-                switch (options.Method)
+                HttpResponseMessage httpResponse;
+                switch (options.Method.Method)
                 {
-                    case HTTPMethod.GET:
-                        return await http.GetAsync(new Uri(options.URI));
-                    case HTTPMethod.POST:
-                        return await http.PostAsync(options.URI, options.HttpContent);
-                    case HTTPMethod.PUT:
-                        return await http.PutAsync(options.URI, options.StringContent);
-                    case HTTPMethod.DELETE:
-                        return await http.DeleteAsync(options.URI);
+                    case "GET":
+                        httpResponse = await http.GetAsync(new Uri(options.URI));
+                        break;
+                    case "POST":
+                        httpResponse = await http.PostAsync(options.URI, options.HttpContent);
+                        break;
+                    case "PUT":
+                        httpResponse = await http.PutAsync(options.URI, options.StringContent);
+                        break;
+                    case "DELETE":
+                        httpResponse = await http.DeleteAsync(options.URI);
+                        break;
                     default:
-                        return null;
+                        throw new HttpUnhandledException(options);
                 }
+
+                string json = await httpResponse.Content.ReadAsStringAsync();
+                return PrepareResponse<T>(json, httpResponse.StatusCode);
             }
             catch (Exception ex)
             {
                 if (ex is TaskCanceledException)
-                    throw new HttpTimeoutException($"A requisição para {options.URI} atingiu o limite de espera.");
+                    throw new HttpTimeoutException($"The request for {options.URI} has reached the waiting limit.", ex);
                 else if (((HttpRequestException)ex).GetBaseException() is SocketException)
-                    throw new HttpServiceUnavaliableException(((HttpRequestException)ex).GetBaseException().Message);
+                    throw new HttpServiceUnavaliableException(((HttpRequestException)ex).GetBaseException().Message, ex);
                 else if (((HttpRequestException)ex).GetBaseException() is WebException)
-                    throw new HttpConnectionFailureException(((HttpRequestException)ex).GetBaseException().Message);
+                    throw new HttpConnectionFailureException(((HttpRequestException)ex).GetBaseException().Message, ex);
                 else
-                    throw;
+                    throw new HttpUnhandledException(options, ex);
             }
         }
 
-        private HttpClient PrepareRequestHeader()
+        protected HttpClient PrepareRequestHeader()
         {
-            if (HTTPClient == null || HTTPClient.IsDisposed)
-                HTTPClient = new HttpClientCustom();
+            if (HttpClient == null)
+                HttpClient = new HttpClient();
 
             if (HttpRequestConfig.Authorization == AuthorizationType.BASIC)
             {
-                HTTPClient.DefaultRequestHeaders.TryAddWithoutValidation(HeadersType.Authorization, HttpRequestConfig.GetBasicAuthHash());
-                HTTPClient.DefaultRequestHeaders.TryAddWithoutValidation(HeadersType.UserAgent, HttpRequestConfig.GetApplicationInfo());
+                HttpClient.DefaultRequestHeaders.TryAddWithoutValidation(HeadersType.Authorization, HttpRequestConfig.GetBasicAuth());
+                HttpClient.DefaultRequestHeaders.TryAddWithoutValidation(HeadersType.UserAgent, HttpRequestConfig.GetApplicationInfo());
             }
             else if (HttpRequestConfig.Authorization == AuthorizationType.BEARER)
             {
-                HTTPClient.DefaultRequestHeaders.TryAddWithoutValidation(HeadersType.Authorization, HttpRequestConfig.GetBearerAuth());
+                HttpClient.DefaultRequestHeaders.TryAddWithoutValidation(HeadersType.Authorization, HttpRequestConfig.GetBearerAuth());
             }
 
             if (RequestHeaders.Count > 0)
                 foreach (var header in RequestHeaders)
-                    if (!HTTPClient.DefaultRequestHeaders.Contains(header.Key))
-                        HTTPClient.DefaultRequestHeaders.TryAddWithoutValidation(header.Key, header.Value);
+                    if (!HttpClient.DefaultRequestHeaders.Contains(header.Key))
+                        HttpClient.DefaultRequestHeaders.TryAddWithoutValidation(header.Key, header.Value);
 
-            return HTTPClient;
+            return HttpClient;
         }
 
-        private StringContent CreateBodyRequest(string jsonData)
+        protected StringContent CreateBodyRequest(string jsonData)
         {
             return new StringContent(jsonData, Encoding.UTF8, MediaType.ApplicationJson);
         }
 
-        private T PrepareResponse<T>(string responseJson, HttpStatusCode statusCode)
+        protected T PrepareResponse<T>(string responseJson, HttpStatusCode statusCode)
         {
             if ((int)statusCode >= (int)HttpStatusCode.OK && (int)statusCode < (int)HttpStatusCode.MultipleChoices)
             {
@@ -263,11 +234,11 @@ namespace GSD.HTTPRequest
                     case HttpStatusCode.NotFound:
                         return default(T);
                     case HttpStatusCode.Unauthorized:
-                        throw new HttpUnauthorizedException("Acesso não autorizado");
+                        throw new HttpUnauthorizedException("Unauthorized Access");
                     case HttpStatusCode.ServiceUnavailable:
-                        throw new HttpServiceUnavaliableException("Serviço temporariamente indisponível! Tente novamente em instantes!");
+                        throw new HttpServiceUnavaliableException("Service Unavaliable");
                     default:
-                        throw new HttpException((int)statusCode, "O serviço apresentou um erro!\nContate o TI!", responseJson);
+                        throw new HttpException((int)statusCode, "Unexpected Error", responseJson);
                 }
             }
         }

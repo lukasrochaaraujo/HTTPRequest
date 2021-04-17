@@ -1,4 +1,4 @@
-﻿namespace GSD.HTTPRequest.Types
+﻿namespace HTTPRequest.Types
 {
     public static class HeadersType
     {

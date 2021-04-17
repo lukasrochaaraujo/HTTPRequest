@@ -1,44 +1,40 @@
 ﻿## HTTPRequest
-Biblioteca para realizar requisições via HTTP
+Simple library to make HTTP requests
 
 **Dependências**
 
-* .NET Standard 2.0.3
-* Newtonsoft.Json 12.0.3
+* .NET Standard 2.x
+* Newtonsoft.Json 13.x
 
-**Utilização**
+**Example with basic auth**
 
 ```csharp
 //basic auth
 var config = new HttpRequestConfig();
-config.AddBasicAuthorization("root", "toor");
+config.AddBasicAuthorization("username", "password");
 var httpRequest = new HttpRequest(config);
-await httpRequest.GETAsync<List<Employer>>("https://api.server.com/employer");
+await httpRequest.GETAsync<IEnumerable<Employer>>("https://api.server.com/employer");
 ```
 
-**Métodos disponíveis**
+**Methods**
 ```csharp
-//Envia uma solicitação GET
-async Task<T> GETAsync<T>(string url);
+void AppendHeader(string key, string value);
 
-//Envia uma solicitação POST
-async Task<T> POSTAsync<T>(string url);
-
-//Envia uma solicitação PUT
-async Task<T> PUTAsync<T>(string url);
-
-//Envia uma solicitação DELETE
-async Task DELETEAsync<T>(string url);
-
-//Adiciona dados ao header
-void AddHeader(string key, string value);
-
-//Remove dados do header
 void RemoveHeader(string key);
 
-//Altera o timout padrão para 60 segundos
-void AddNewTimeout(60);
+void ClearHeader();
 
-//Reinicia a instância HttpClient e mantém os headers adicionados
-void ResetHTTPClientAndKeepHeaders();
+void ChangeTimeoutFromSeconds(60);
+
+async Task<T> GETAsync<T>(string url);
+
+async Task<T> POSTAsync<T>(string url, string jsonData);
+
+async Task<T> POSTAsync<T>(string url, HttpContent httpContent);
+
+async Task<T> PUTAsync<T>(string url);
+
+async Task<T> PUTAsync<T>(string url, string jsonData);
+
+async Task DELETEAsync<T>(string url);
 ```

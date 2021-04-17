@@ -1,9 +1,10 @@
 ﻿using System;
 
-namespace GSD.HTTPRequest.Exceptions
+namespace HTTPRequest.Exceptions
 {
     public class HttpConnectionFailureException : Exception
     {
-        public HttpConnectionFailureException(string message) : base(message) { }
+        public HttpConnectionFailureException(string message, Exception innerException) : 
+            base(message, innerException) { }
     }
 }
