@@ -7,8 +7,6 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-using HTTPRequest.Model;
-
 namespace HTTPRequest
 {
     public class HttpRequest
