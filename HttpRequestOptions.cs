@@ -1,17 +1,11 @@
-﻿using System.Net.Http;
-
-namespace HTTPRequest
+﻿namespace HTTPRequest
 {
     public class HttpRequestOptions
     {
-        public HttpMethod Method { get; set; }
+        public string DateTimeFormat { get; set; } = "yyyy-MM-ddTHH:mm:ss";
 
-        public string URI { get; set; }
+        public int TimeOutInSeconds { get; set; } = 30;
 
-        public string StringJson { get; set; }
-
-        public StringContent StringContent { get; set; }
-
-        public HttpContent HttpContent { get; set; }
+        public int MaxRequestAttempts { get; set; } = 3;
     }
 }

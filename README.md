@@ -1,5 +1,5 @@
 ﻿## HTTPRequest
-Simple library to make HTTP requests
+Simple library to make HTTP requests using JSON
 
 **Dependências**
 
@@ -9,11 +9,19 @@ Simple library to make HTTP requests
 **Example with basic auth**
 
 ```csharp
-//basic auth
-var config = new HttpRequestConfig();
-config.AddBasicAuthorization("username", "password");
-var httpRequest = new HttpRequest(config);
+var httpRequest = new HttpRequest();
+httpRequest.AppendHeader("Authorization", "Bearer token")
 await httpRequest.GETAsync<IEnumerable<Employer>>("https://api.server.com/employer");
+```
+
+**HttpRequest options**
+```csharp
+new HttpRequest(new HttpRequestOptions()
+{
+    DateTimeFormat = "iso_datetime_format",
+    TimeOutInSeconds = 30,
+    MaxRequestAttempts = 3
+});
 ```
 
 **Methods**
@@ -22,15 +30,11 @@ void AppendHeader(string key, string value);
 
 void RemoveHeader(string key);
 
-void ClearHeader();
-
-void ChangeTimeoutFromSeconds(60);
+void ClearHeaders();
 
 async Task<T> GETAsync<T>(string url);
 
 async Task<T> POSTAsync<T>(string url, string jsonData);
-
-async Task<T> POSTAsync<T>(string url, HttpContent httpContent);
 
 async Task<T> PUTAsync<T>(string url);
 
