@@ -3,7 +3,7 @@
  
 Simple library to make HTTP requests using JSON
 
-**Dependências**
+**Dependecies**
 
 * .NET Standard 2.x
 * Newtonsoft.Json 13.x
