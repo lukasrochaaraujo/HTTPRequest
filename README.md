@@ -8,7 +8,7 @@ Simple library to make HTTP requests using JSON
 * .NET Standard 2.x
 * Newtonsoft.Json 13.x
 
-**Example with basic auth**
+**Example with bearer auth**
 
 ```csharp
 var httpRequest = new HttpRequest();
