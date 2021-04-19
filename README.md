@@ -1,4 +1,6 @@
 ﻿## HTTPRequest
+[![NuGet package](https://buildstats.info/nuget/HTTPRequest)](https://www.nuget.org/packages/HTTPRequest)
+ 
 Simple library to make HTTP requests using JSON
 
 **Dependências**
