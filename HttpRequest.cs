@@ -1,20 +1,26 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using System;
 using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-
 namespace HTTPRequest
 {
+    /// <summary>
+    /// Performs requests HTTP with the main verbs and using the JSON format
+    /// </summary>
     public class HttpRequest
     {
         protected readonly HttpClient HttpClient;
 
         protected readonly HttpRequestOptions HttpRequestOptions;
 
+        /// <summary>
+        /// Starts a new instance with the (optional) settings provided.
+        /// </summary>
+        /// <param name="options">Settings to be applied</param>
         public HttpRequest(HttpRequestOptions options = null)
         {
             HttpRequestOptions = options ?? new HttpRequestOptions();
@@ -33,22 +39,22 @@ namespace HTTPRequest
         public void ClearHeaders()
             => HttpClient.DefaultRequestHeaders.Clear();
 
-        public async Task<T> GETAsync<T>(string url)
-            => await SendRequest<T>(HttpMethod.Get, url);
+        public async Task<TReturnType> GETAsync<TReturnType>(string url)
+            => await SendRequest<TReturnType>(HttpMethod.Get, url);
 
-        public async Task<T> POSTAsync<T>(string url, string jsonBody)
-            => await SendRequest<T>(HttpMethod.Post, url, jsonBody);
+        public async Task<TReturnType> POSTAsync<TReturnType>(string url, string jsonBody)
+            => await SendRequest<TReturnType>(HttpMethod.Post, url, jsonBody);
 
-        public async Task<T> PUTAsync<T>(string url)
-            => await SendRequest<T>(HttpMethod.Put, url);
+        public async Task<TReturnType> PUTAsync<TReturnType>(string url)
+            => await SendRequest<TReturnType>(HttpMethod.Put, url);
 
-        public async Task<T> PUTAsync<T>(string url, string jsonBody)
-            => await SendRequest<T>(HttpMethod.Put, url, jsonBody);
+        public async Task<TReturnType> PUTAsync<TReturnType>(string url, string jsonBody)
+            => await SendRequest<TReturnType>(HttpMethod.Put, url, jsonBody);
 
-        public async Task DELETEAsync<T>(string url)
-            => await SendRequest<T>(HttpMethod.Delete, url);
+        public async Task DELETEAsync<TReturnType>(string url)
+            => await SendRequest<TReturnType>(HttpMethod.Delete, url);
 
-        protected async Task<T> SendRequest<T>(HttpMethod method, string url, string jsonBody = null)
+        protected async Task<TReturnType> SendRequest<TReturnType>(HttpMethod method, string url, string jsonBody = null)
         {
             HttpResponseMessage httpResponse = null;
             try
@@ -85,14 +91,17 @@ namespace HTTPRequest
                     catch
                     {
                         if (currentRequestTentative++ < HttpRequestOptions.MaxRequestAttempts)
+                        {
+                            await Task.Delay(TimeSpan.FromSeconds(HttpRequestOptions.IntevalBetweenAttemptsInSeconds));
                             continue;
+                        }
 
                         throw;
                     }
                 }
 
                 string json = await httpResponse.Content.ReadAsStringAsync();
-                return PrepareResponse<T>(json, httpResponse.StatusCode);
+                return PrepareResponse<TReturnType>(json, httpResponse.StatusCode);
             }
             catch (Exception ex)
             {
@@ -108,26 +117,26 @@ namespace HTTPRequest
             return new StringContent(jsonData, Encoding.UTF8, "application/json");
         }
 
-        protected T PrepareResponse<T>(string responseJson, HttpStatusCode statusCode)
+        protected TResponseType PrepareResponse<TResponseType>(string responseJson, HttpStatusCode statusCode)
         {
-            if (typeof(T) == typeof(BasicResponseModel))
+            if (typeof(TResponseType) == typeof(BasicResponseModel))
             {
                 var responseModel = new BasicResponseModel()
                 {
                     StatusCode = (int)statusCode,
-                    JsonBody = responseJson
+                    ResponseBody = responseJson
                 };
 
-                return (T)Convert.ChangeType(responseModel, typeof(T));
+                return (TResponseType)Convert.ChangeType(responseModel, typeof(TResponseType));
             }
             else
             {
                 if (string.IsNullOrWhiteSpace(responseJson))
-                    return default(T);
+                    return default(TResponseType);
                 else if (responseJson == "[]" || responseJson == "{}")
-                    return (T)Activator.CreateInstance(typeof(T));
+                    return (TResponseType)Activator.CreateInstance(typeof(TResponseType));
                 else
-                    return JsonConvert.DeserializeObject<T>(responseJson, new IsoDateTimeConverter() { DateTimeFormat = HttpRequestOptions.DateTimeFormat });
+                    return JsonConvert.DeserializeObject<TResponseType>(responseJson, new IsoDateTimeConverter() { DateTimeFormat = HttpRequestOptions.DateTimeFormat });
             }
         }
     }
