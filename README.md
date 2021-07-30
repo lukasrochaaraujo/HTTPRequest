@@ -22,7 +22,8 @@ new HttpRequest(new HttpRequestOptions()
 {
     DateTimeFormat = "iso_datetime_format",
     TimeOutInSeconds = 30,
-    MaxRequestAttempts = 3
+    MaxRequestAttempts = 3,
+    IntevalBetweenAttemptsInSeconds = 5
 });
 ```
 
