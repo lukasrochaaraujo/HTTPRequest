@@ -1,11 +1,13 @@
 ﻿## HTTPRequest
 [![NuGet package](https://buildstats.info/nuget/HTTPRequest)](https://www.nuget.org/packages/HTTPRequest)
+[![build](https://github.com/lukasrochaaraujo/HTTPRequest/actions/workflows/dotnet.yml/badge.svg)](https://github.com/lukasrochaaraujo/HTTPRequest/actions/workflows/dotnet.yml)
  
 Simple library to make HTTP requests using JSON
 
 **Dependecies**
 
 * .NET Standard 2.x
+* Microsoft.Extensions.DependencyInjection.Abstractions 6.x
 * Newtonsoft.Json 13.x
 
 **Example with bearer auth**
@@ -27,6 +29,32 @@ new HttpRequest(new HttpRequestOptions()
 });
 ```
 
+**HttpRequest Dependency Injection**
+```csharp
+(...)
+services.AddHttpRequest(); //simple with default options values
+//OR
+services.AddHttpRequest(provider => //with custom options values
+{
+    return new HttpRequest(new HttpRequestOptions
+    {
+        TimeOutInSeconds = 120,
+        MaxRequestAttempts = 5
+        (...)
+    });
+});
+(...)
+//Constructor DI
+(...)
+private readonly IHttpRequest _httpRequest;
+
+public MyClass(IHttpRequest httpRequest)
+{
+    _httpRequest = httpRequest;
+}
+(...)
+```
+
 **Methods**
 ```csharp
 void AppendHeader(string key, string value);
@@ -45,3 +73,4 @@ async Task<T> PUTAsync<T>(string url, string jsonData);
 
 async Task DELETEAsync<T>(string url);
 ```
+
