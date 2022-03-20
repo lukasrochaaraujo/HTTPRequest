@@ -5,21 +5,14 @@ namespace HTTPRequest.DependencyInjection
 {
     public static class HttpRequestDependencyInjection
     {
-        public static void AddHttpRequest(this IServiceCollection services, Func<IServiceProvider, HttpRequest> options)
+        public static IServiceCollection AddHttpRequest(this IServiceCollection services, Func<IServiceProvider, HttpRequest> options = null)
         {
-            Func<IServiceProvider, HttpRequest> defaultOptions = (provider) =>
-            {
-                var httpOptions = new HttpRequestOptions
-                {
-                    IntevalBetweenAttemptsInSeconds = 3,
-                    MaxRequestAttempts = 3,
-                    TimeOutInSeconds = 60
-                };
-
-                return new HttpRequest(httpOptions);
-            };
+            Func<IServiceProvider, HttpRequest> defaultOptions = (provider) 
+                => new HttpRequest(new HttpRequestOptions());
 
             services.AddTransient<IHttpRequest, HttpRequest>(options ?? defaultOptions);
+
+            return services;
         }
     }
 }
