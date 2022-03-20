@@ -1,5 +1,6 @@
 ﻿## HTTPRequest
 [![NuGet package](https://buildstats.info/nuget/HTTPRequest)](https://www.nuget.org/packages/HTTPRequest)
+[![build](https://github.com/lukasrochaaraujo/HTTPRequest/actions/workflows/dotnet.yml/badge.svg)](https://github.com/lukasrochaaraujo/HTTPRequest/actions/workflows/dotnet.yml)
  
 Simple library to make HTTP requests using JSON
 
