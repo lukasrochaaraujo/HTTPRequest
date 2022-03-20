@@ -8,10 +8,7 @@ using System.Threading.Tasks;
 
 namespace HTTPRequest
 {
-    /// <summary>
-    /// Performs requests HTTP with the main verbs and using the JSON format
-    /// </summary>
-    public class HttpRequest
+    public class HttpRequest : IHttpRequest
     {
         protected readonly HttpClient HttpClient;
 
